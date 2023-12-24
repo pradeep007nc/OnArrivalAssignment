@@ -1,16 +1,20 @@
 package dev.pradeep.OnTravelsAssignment.Entity.LocationEntites;
-import dev.pradeep.OnTravelsAssignment.Entity.User;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
+
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.List;
+import java.util.Map;
 
 
+/*
+    feature is a individual tourist location
+ */
 @Getter
 @Setter
 @AllArgsConstructor
@@ -27,8 +31,22 @@ public class Feature {
     private List<Double> center;
     private List<Context> context;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+
+    /*
+        this data structure takes two parameters userid and ratings for this tourist attraction object
+        by default map doesn't take duplicate values so no user can rate twice
+     */
+    private Map<String, @Min(0) @Max(5) Integer> touristRatings;
+
+    /*
+        Finding average rating of a individual tourist location
+     */
+    public int findAvgRatings(){
+        int avgRatings = 0;
+        for (Integer rating: touristRatings.values()){
+            avgRatings += rating;
+        }
+        return avgRatings/touristRatings.size();
+    }
 
 }

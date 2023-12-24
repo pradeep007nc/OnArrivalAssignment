@@ -1,53 +1,84 @@
 package dev.pradeep.OnTravelsAssignment.Controller;
 
+import dev.pradeep.OnTravelsAssignment.Dto.LocationDto;
 import dev.pradeep.OnTravelsAssignment.Entity.LocationEntites.Feature;
+import dev.pradeep.OnTravelsAssignment.Entity.UserRatings;
 import dev.pradeep.OnTravelsAssignment.Services.LocationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /*
-    location controller
-    GET find_locations/{locationName} for ex : find_locations/kolkata -> returns list of tourist attraction places
-    POST save_locations/{locationName} -> saves all the data in database
-    GET saved_locations/{locationId} -> fetch all data
+    controller for tourist attraction data and rating tourist destination
+    in postman choose basic auth in username enter email
+    in password enter user password
+    ex:
+    {
+        "email": "pradeepnaidu2486@gmail.com",
+        "password": "demouser"
+    }
  */
 
 @RestController
 @RequestMapping("/api/locations")
 public class LocationController {
 
+    @Autowired
     private LocationService locationService;
 
-    public LocationController(LocationService locationService){
-        this.locationService = locationService;
+    @GetMapping("/dummy_test")
+    public List<String> test(){
+        return Stream.of("demo", "pradeep").collect(Collectors.toList());
     }
 
     /*
-        note - this data is fetched from mapbox
-        not saved in database live data rendered from mapbox
-        controller to find all the tourist locations/ poi(point of interest) that are based on location name
+        controller to fetch live locations from mapbox
+        takes parameter location name and returns list of all tourist attractions in that location
+        ex: http://localhost:8080/api/locations/raw_mapbox_locations/kolkata
+        returns raw data fetched from mapbox
      */
-    @GetMapping("/find_locations/{locationName}")
-    public ResponseEntity<List<Feature>> test(@PathVariable String locationName) {
-        return ResponseEntity.ok().body(this.locationService.fetchAllLocations(locationName));
+    @GetMapping("/raw_mapbox_locations/{locationName}")
+    public ResponseEntity<List<Feature>> fetchAllLocations(@PathVariable String locationName){
+           return ResponseEntity.status(200).body(this.locationService.fetchAllLocations(locationName));
     }
 
     /*
-        controller to save location based on location name in database
+        also fetches data from mapbox live data but returns filtered data
+        takes location name as parameter and returns location dto
+        ex:   http://localhost:8080/api/locations/fetch_locations/kolkata
+        {
+        "id": "poi.68719527974",
+        "placeName": null,
+        "address": "palace Rd.",
+        "category": "mall, shop",
+        "ratings": null
+      }
+     */
+    @GetMapping("/fetch_locations/{locationName}")
+    public List<LocationDto> fetchRefinedLocations(@PathVariable String locationName){
+        return this.locationService.fetchAllLocationsByName(locationName);
+    }
+
+    /*
+        save filtered data in database
      */
     @PostMapping("/save_locations/{locationName}")
-    public void saveLocations(@PathVariable String locationName){
-        this.locationService.saveAllLocations(locationName);
+    public ResponseEntity<?> saveLocations(@PathVariable String locationName){
+        this.locationService.saveAllLocationByLocationName(locationName);
+        return ResponseEntity.status(200).body("saved data successfully");
     }
 
     /*
-        controller to get all the data
+        delete location from the database
      */
-    @GetMapping("/saved_locations/{locationId}")
-    public List<Feature> savedLocations(@PathVariable String locationId){
-        return this.locationService.fetchAllLocations(locationId);
+    @DeleteMapping("/delete_locations/{locationName}")
+    public ResponseEntity<?> deleteLocationByLocationName(@PathVariable String locationName){
+        this.locationService.deleteLocationByName(locationName);
+        return ResponseEntity.status(200).body("deleted successfully");
     }
-
 
 }

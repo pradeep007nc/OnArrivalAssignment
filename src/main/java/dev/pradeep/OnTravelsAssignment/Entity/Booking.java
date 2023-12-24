@@ -1,10 +1,7 @@
 package dev.pradeep.OnTravelsAssignment.Entity;
 
-import dev.pradeep.OnTravelsAssignment.Entity.LocationEntites.Feature;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.pradeep.OnTravelsAssignment.Dto.LocationDto;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -12,21 +9,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Document(collection = "bookings")
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
 public class Booking {
 
     @Id
-    public User user;
+    public String userId;
 
-    public List<Feature> bookedLocations;
+    @JsonProperty(required = false)
+    public List<LocationDto> bookedLocations;
 
-    public void addFeature(Feature feature){
-        if(bookedLocations == null){
+    public void addBookings(LocationDto locationDto){
+        if (bookedLocations == null){
             bookedLocations = new ArrayList<>();
         }
-        bookedLocations.add(feature);
+        bookedLocations.add(locationDto);
     }
 }

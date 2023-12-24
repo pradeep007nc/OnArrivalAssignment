@@ -1,79 +1,83 @@
 package dev.pradeep.OnTravelsAssignment.Services;
 
+import dev.pradeep.OnTravelsAssignment.Dto.BookingLocationDto;
+import dev.pradeep.OnTravelsAssignment.Dto.LocationDto;
 import dev.pradeep.OnTravelsAssignment.Entity.Location;
 import dev.pradeep.OnTravelsAssignment.Entity.LocationEntites.Feature;
 import dev.pradeep.OnTravelsAssignment.Entity.User;
-import dev.pradeep.OnTravelsAssignment.Repositories.UserRepository;
+import dev.pradeep.OnTravelsAssignment.Repository.LocationRepository;
+import dev.pradeep.OnTravelsAssignment.Repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.DataInput;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+
+/*
+    user services for crud users operations
+ */
+/*
+    add user is already existing in signup
+    just adding fetch all users delete users and other crud related operations
+*/
 @Service
 public class UserService {
 
-    private UserRepository repository;
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private LocationRepository locationRepository;
+
+    @Autowired
     private LocationService locationService;
 
-    public UserService(UserRepository repository, LocationService locationService){
-        this.locationService = locationService;
-        this.repository = repository;
-    }
-
-
-    public boolean addUser(User user){
-        Optional<User> data = repository.findById(user.getName());
-        if (data.isEmpty()){
-            repository.save(user);
-            return true;
-        }
-        return false;
-    }
-
     /*
-     delete a user
-     takes a parameter userId
-     */
-    public boolean deleteUser(String id){
-        Optional<User> user = repository.findById(id);
-        if (user.isPresent()){
-            repository.delete(user.get());
-            return true;
-        }
-        return false;
-    }
-
-    /*
-        Fetching all users
+        fetch all users
      */
     public List<User> fetchAllUsers(){
-        return this.repository.findAll();
+        return this.userRepository.findAll();
     }
 
     /*
-        saving individual location(feature/particular location) in a user object
-        takes parameter feature id
+        update user by id
      */
-    public boolean saveSpotsForUser(String userName, Location location, String featureId){
-        Optional<User> data = repository.findById(userName);
-        if (data.isPresent()){
-            for (Feature feature: location.getFeatures()){
-                //checking for features
-                if (feature.getId().equals(featureId)){
-                    //for that user object add the particular feature
-                    data.get().addLocations(feature);
-                }
-            }
-            return true;
+    public void updateUserById(User user){
+        Optional<User> userData = this.userRepository.findById(user.getUserName());
+
+        if (userData.isPresent()){
+            User dummyUser = userData.get();
+            dummyUser.setUserName(user.userName);
+            dummyUser.setUserAddress(user.userAddress);
+            this.userRepository.save(dummyUser);
         }
-        return false;
+
     }
 
-    public void deleteAllUsers(){
-        this.repository.deleteAll();
+    /*
+        delete user by id
+     */
+    public void deleteUserById(String userId){
+        Optional<User> userData = this.userRepository.findById(userId);
+        if (userData.isPresent()){
+            this.userRepository.delete(userData.get());
+        }
     }
+
+    /*
+        get user by id
+     */
+    public User fetchUserById(String userId){
+        Optional<User> userData = this.userRepository.findById(userId);
+        if (userData.isPresent()){
+            return userData.get();
+        }
+        return null;
+    }
+
+
+
 
 
 
