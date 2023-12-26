@@ -23,7 +23,7 @@ public class SwaggerConfig {
     public Docket activateApi() {
         return new Docket(DocumentationType.SWAGGER_2)
                 .select()
-                .apis(RequestHandlerSelectors.basePackage("dev.pradeep.OnTravelsAssignment"))
+                .apis(RequestHandlerSelectors.basePackage("dev.pradeep.OnArrivalAssignment"))
                 .paths(PathSelectors.regex("/api.*"))
                 .build()
                 .apiInfo(metaInfo());
