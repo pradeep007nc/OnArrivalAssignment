@@ -32,8 +32,6 @@ mvn spring-boot:run
 # Documentation for apis(swagger)
 "[Swagger API documentation](http://localhost:8080/swagger-ui/index.html)"
 
-Aws free tier
-
 server ip = localhost
 port: 8080
-The application is hosted on: http://localhost:8080/
+url: http://localhost:8080/
